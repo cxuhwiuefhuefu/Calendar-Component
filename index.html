@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.js"></script>
+    <style>
+            .calendar{
+                width: 500px;
+                margin-left: 100px;
+            }
+            .date-header{
+                width: 100%;
+                display: flex;
+                line-height: 30px;
+            }
+            .prev-month,
+            .next-month{
+                border: 15px solid transparent;
+                width: 0;
+                height: 0;
+                cursor: pointer;
+            }
+            .prev-month{
+                border-right-color: #007fff;
+            }
+            .next-month{
+                border-left-color: #007fff;
+            }
+            .show-date{
+                flex: 1; /* flex-grow(默认为0) flex-shrink(默认为1) flex-basis(默认为auto)  */
+                text-align: center;
+                color: #007fff;
+            }
+            .week-header{
+                display: flex;
+            }
+            .week-header > div{
+                flex: 1;
+                text-align: center;
+                line-height: 30px;
+                background-color: #007fff;
+                color: #fff;
+                font-weight: 600;
+            }
+            .week-day{
+                width: 100%;
+            }
+            .every-day{
+                display: inline-block;
+                width: 14.28%;
+                line-height: 50px;
+                text-align: center;
+                cursor: pointer;
+            }
+            .other-day{
+                color: #ccc;
+            }
+            .now-day{
+                background-color: #007fff;
+                color: #fff;
+                font-weight: 600;
+            }
+            .active-day:not(.now-day) {
+                color: #007fff;
+                border: 2px solid #007fff;
+                line-height: 46px;
+            }
+        </style>
+</head>
+<body>
+    
+    <div id="app">
+        <div class="calendar">
+            <div class="date-header">
+                <div class="prev-month" @click="handlePrev"></div>
+                <div class="show-date">{{`${year}年${month}月${day}日`}}</div>
+                <div class="next-month" @click="handleNext"></div>
+            </div>
+            <div class="data-content">
+                <div class="week-header">
+                    <div>日</div>
+                    <div>一</div>
+                    <div>二</div>
+                    <div>三</div>
+                    <div>四</div>
+                    <div>五</div>
+                    <div>六</div>
+                </div>
+                <div class="week-day">
+                    <div class="every-day" v-for="item in 42">
+                      
+                        <!-- {{item - getBeginDay()}} -->
+                        <!-- {{ item - beginDay }} -->
+
+
+                        <!-- <div v-if="item - beginDay <= 0" style="color: red">{{ item - beginDay }}</div>
+                        <div v-else-if="item - beginDay > 0 && item -beginDay <= getCurDays()">{{ item - beginDay }}</div>
+                        <div v-else style="color: blue">{{ item - getCurDays() - beginDay }}</div> -->
+
+
+                        <!-- <div v-if="item - beginDay <= 0" class="other-day">{{ item - beginDay + preDays}}</div>
+                        <div v-else-if="item - beginDay > 0 && item -beginDay <= curDays"
+                            :class="{
+                                'now-day': `${year}-${month}-${item-beginDay}` === curDate,
+                                'active-day': `${year}-${month}-${item-beginDay}` ===  `${year}-${month}-${day}`
+                            }"
+                            @click="handleChoose(item - beginDay)"
+                            >{{ item - beginDay }}</div>
+                        <div v-else class="other-day">{{ item - curDays - beginDay }}</div> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        
+        // 补充一个小练习: 日历组件
+
+
+
+        // 在最上面展示的是我们当前的日期
+        // 在下面也会给我们加一个另类的样式凸显出来我们当前的日期
+        // 还可以去进行点击其他日期 再点击的时候最上面是展示我们点击哪一个就展示哪一个
+        // 还可以进行月份的切换
+    
+    
+        
+        new Vue({
+            el: '#app',
+            data: {
+                year: null,
+                month: null,
+                day: null
+            },
+            created() {
+                this.getInitDate();
+            },
+            methods: {
+                getInitDate() { // 得到初始日期 减低date数据的复杂度 给个初始值为null 只调用一次new Date();
+                    const date = new Date();
+                    this.year = date.getFullYear();
+                    this.month = date.getMonth() + 1;
+                    this.day = date.getDate();
+                    
+                    this.curDate = `${this.year}-${this.month}-${this.day}`;
+                },
+                // getBeginDay() { // 获取开始日期 把它写在计算属性比较好的 因为我们是优先使用计算属性 因为在methods这个函数里面只要我们页面上的数据关于我们渲染的数据进行了更改 
+                //                 //     那这个函数肯定会再去执行一次 那这个性能是不好的 遇到这些情况 我们某些值要依赖于我们数据当中某个值的时候 我们最好把它写在计算属性里面
+                //     return new Date(this.year, this.month - 1, 1).getDay();
+                // }
+                getCurDays() {
+                    const month = this.month;
+                    const year = this.year;
+
+                    // 遇到大量判断的情况怎么办 最好把他们都放到数组里面
+                    if([1, 3, 5, 7, 8, 10, 12].includes(month)) {
+                        return 31;
+                    }else if([4, 6, 9, 11].includes(month)) {
+                        return 30;
+                    }else {
+                        if(year % 400 === 0 || (year % 4 === 0 && year % 100 !== 0)) { //普通闰年 || 世纪闰年
+                            return 29;
+                        }
+                        return 28;
+                    }
+                },
+                handleChoose(day) { // 我需要知道我点击的是哪一天 需要传参数
+                    this.day = day;
+                },
+                handlePrev() { // 切换月份的显示就可以了 只需要去改变数据中月份的值就行了 因为其他的操作我们都写写在计算属性里面去了 只要我们去改变month的值 他们就可以去获取beginDay 只要我们改变month或者years的话 就可以获得这个月份的总的天数和上一个月份的总天数
+                    if(this.month === 1) {
+                        this.month = 12;
+                        this.year --;
+                    }else {
+                        this.month --;
+                    }
+                },
+                handleNext() {
+                    if(this.month === 12) {
+                        this.month = 1;
+                        this.year ++;
+                    }else {
+                        this.month ++;
+                    }
+                }
+            },
+            computed: {
+                beginDay() { // 0-9
+                    return new Date(this.year, this.month - 1, 1).getDay();
+                },
+                curDays() {
+                    return new Date(this.year, this.month, 0).getDate();
+                },
+                // 获取到上个月的总天数
+                preDays() {
+                    return new Date(this.year, this.month - 1, 0).getDate();
+                }
+            },
+        })
+
+        // 获得这个月的天数 然后告诉我们的程序去显示
+
+        // 星期几 new Date(2019, 1, 1).getDay();
+        // 月份天数  new Date(2019, 1, 0).getDate();
+
+
+        
+
+        // 模板字符串的好处 (https://blog.csdn.net/zwt_guiji/article/details/81979299)
+        //     1. 和普通字符串的使用一样 
+        //     2. 多行字符串 
+        //     3. 字符串中嵌入变量 
+        //     4. 模板字符串中还可以调用函数 
+        //     5. 模板字符串之间还可以进行嵌套
+    
+    </script>
+
+</body>
+</html>
