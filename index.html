@@ -47,6 +47,7 @@
             }
             .week-day{
                 width: 100%;
+                background: #515151;
             }
             .every-day{
                 display: inline-block;
@@ -56,16 +57,21 @@
                 cursor: pointer;
             }
             .other-day{
-                color: #ccc;
+                color: #5C5C5C;
             }
+            .every-day:not(.other-day) {
+                color: #fff;
+            }
+            /* 当前日期  */
             .now-day{
                 background-color: #007fff;
                 color: #fff;
                 font-weight: 600;
             }
+            /* 鼠标移动选中时候的颜色 */
             .active-day:not(.now-day) {
                 color: #007fff;
-                border: 2px solid #007fff;
+                border: 2px solid #cccccc;
                 line-height: 46px;
             }
         </style>
@@ -79,37 +85,34 @@
                 <div class="show-date">{{`${year}年${month}月${day}日`}}</div>
                 <div class="next-month" @click="handleNext"></div>
             </div>
-            <div class="data-content">
+            <div class="date-content">
                 <div class="week-header">
-                    <div>日</div>
                     <div>一</div>
                     <div>二</div>
                     <div>三</div>
                     <div>四</div>
                     <div>五</div>
                     <div>六</div>
+                    <div>日</div>
                 </div>
                 <div class="week-day">
-                    <div class="every-day" v-for="item in 42">
-                      
-                        <!-- {{item - getBeginDay()}} -->
-                        <!-- {{ item - beginDay }} -->
-
-
-                        <!-- <div v-if="item - beginDay <= 0" style="color: red">{{ item - beginDay }}</div>
-                        <div v-else-if="item - beginDay > 0 && item -beginDay <= getCurDays()">{{ item - beginDay }}</div>
-                        <div v-else style="color: blue">{{ item - getCurDays() - beginDay }}</div> -->
-
-
-                        <!-- <div v-if="item - beginDay <= 0" class="other-day">{{ item - beginDay + preDays}}</div>
-                        <div v-else-if="item - beginDay > 0 && item -beginDay <= curDays"
-                            :class="{
-                                'now-day': `${year}-${month}-${item-beginDay}` === curDate,
-                                'active-day': `${year}-${month}-${item-beginDay}` ===  `${year}-${month}-${day}`
-                            }"
-                            @click="handleChoose(item - beginDay)"
-                            >{{ item - beginDay }}</div>
-                        <div v-else class="other-day">{{ item - curDays - beginDay }}</div> -->
+                    <div class="every-day" v-for="(item, index) in 42">
+                        <div v-if="item - beginDay <= 0"
+                             :class="{'other-day': true, 
+                                      'now-day': `${year}-${month - 1}-${item - beginDay + preDays}` === curDate}">
+                                      {{item - beginDay + preDays}}
+                        </div>
+                        <div v-else-if="item - beginDay > 0 && item - beginDay <= curDays" 
+                             :class="{'now-day': `${year}-${month}-${item - beginDay}` === curDate,
+                                      'active-day': `${item-beginDay}` === `${day}`}"
+                             @mouseover = "handleChoose(item - beginDay)">
+                             {{item - beginDay}}
+                        </div>
+                        <div v-else
+                             :class="{'other-day': true,
+                                      'now-day': `${year}-${month + 1}-${item - beginDay - curDays}` === curDate}">
+                                      {{item - beginDay - curDays}}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -168,6 +171,7 @@
                     }
                 },
                 handleChoose(day) { // 我需要知道我点击的是哪一天 需要传参数
+                    // console.log(day);
                     this.day = day;
                 },
                 handlePrev() { // 切换月份的显示就可以了 只需要去改变数据中月份的值就行了 因为其他的操作我们都写写在计算属性里面去了 只要我们去改变month的值 他们就可以去获取beginDay 只要我们改变month或者years的话 就可以获得这个月份的总的天数和上一个月份的总天数
@@ -188,14 +192,23 @@
                 }
             },
             computed: {
-                beginDay() { // 0-9
-                    return new Date(this.year, this.month - 1, 1).getDay();
+                // 这个月的第一个天是一周中的第几天
+                beginDay() { // 取值范围0-6
+                    console.log('beginDay', new Date(this.year, this.month - 1, 1).getDay());
+
+                    if(new Date(this.year, this.month - 1, 1).getDay() === 0) {
+                        return 6;
+                    }
+                    return new Date(this.year, this.month - 1, 1).getDay() - 1;
                 },
-                curDays() {
+                // 当前这个月有多少天
+                curDays() { 
+                    console.log('curDay', new Date(this.year, this.month, 0).getDate());
                     return new Date(this.year, this.month, 0).getDate();
                 },
                 // 获取到上个月的总天数
                 preDays() {
+                    console.log('preDays', new Date(this.year, this.month - 1, 0).getDate());
                     return new Date(this.year, this.month - 1, 0).getDate();
                 }
             },
@@ -210,11 +223,14 @@
         
 
         // 模板字符串的好处 (https://blog.csdn.net/zwt_guiji/article/details/81979299)
-        //     1. 和普通字符串的使用一样 
-        //     2. 多行字符串 
-        //     3. 字符串中嵌入变量 
-        //     4. 模板字符串中还可以调用函数 
-        //     5. 模板字符串之间还可以进行嵌套
+            // 1. 和普通字符串的使用一样 
+            // 2. 多行字符串 
+            // 3. 字符串中嵌入变量 
+            // 4. 模板字符串中还可以调用函数 
+            // 5. 模板字符串之间还可以进行嵌套
+
+        // 动态class
+        // computed与watch的区别
     
     </script>
 
