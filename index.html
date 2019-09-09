@@ -154,27 +154,28 @@
                 //                 //     那这个函数肯定会再去执行一次 那这个性能是不好的 遇到这些情况 我们某些值要依赖于我们数据当中某个值的时候 我们最好把它写在计算属性里面
                 //     return new Date(this.year, this.month - 1, 1).getDay();
                 // }
-                getCurDays() {
-                    const month = this.month;
-                    const year = this.year;
+                // getCurDays() {
+                //     const month = this.month;
+                //     const year = this.year;
 
-                    // 遇到大量判断的情况怎么办 最好把他们都放到数组里面
-                    if([1, 3, 5, 7, 8, 10, 12].includes(month)) {
-                        return 31;
-                    }else if([4, 6, 9, 11].includes(month)) {
-                        return 30;
-                    }else {
-                        if(year % 400 === 0 || (year % 4 === 0 && year % 100 !== 0)) { //普通闰年 || 世纪闰年
-                            return 29;
-                        }
-                        return 28;
-                    }
-                },
+                //     // 遇到大量判断的情况怎么办 最好把他们都放到数组里面
+                //     if([1, 3, 5, 7, 8, 10, 12].includes(month)) {
+                //         return 31;
+                //     }else if([4, 6, 9, 11].includes(month)) {
+                //         return 30;
+                //     }else {
+                //         if(year % 400 === 0 || (year % 4 === 0 && year % 100 !== 0)) { //普通闰年 || 世纪闰年
+                //             return 29;
+                //         }
+                //         return 28;
+                //     }
+                // },
                 handleChoose(day) { // 我需要知道我点击的是哪一天 需要传参数
-                    // console.log(day);
                     this.day = day;
                 },
-                handlePrev() { // 切换月份的显示就可以了 只需要去改变数据中月份的值就行了 因为其他的操作我们都写写在计算属性里面去了 只要我们去改变month的值 他们就可以去获取beginDay 只要我们改变month或者years的话 就可以获得这个月份的总的天数和上一个月份的总天数
+                handlePrev() { // 切换月份的显示就可以了 只需要去改变数据中月份的值就行了 因为其他的操作我们都写写在计算属性里面去了
+                               //     只要我们去改变month的值 他们就可以去获取beginDay 只要我们改变month或者years的话 
+                               //     就可以获得这个月份的总的天数和上一个月份的总天数
                     if(this.month === 1) {
                         this.month = 12;
                         this.year --;
@@ -194,8 +195,6 @@
             computed: {
                 // 这个月的第一个天是一周中的第几天
                 beginDay() { // 取值范围0-6
-                    console.log('beginDay', new Date(this.year, this.month - 1, 1).getDay());
-
                     if(new Date(this.year, this.month - 1, 1).getDay() === 0) {
                         return 6;
                     }
@@ -203,12 +202,10 @@
                 },
                 // 当前这个月有多少天
                 curDays() { 
-                    console.log('curDay', new Date(this.year, this.month, 0).getDate());
                     return new Date(this.year, this.month, 0).getDate();
                 },
                 // 获取到上个月的总天数
                 preDays() {
-                    console.log('preDays', new Date(this.year, this.month - 1, 0).getDate());
                     return new Date(this.year, this.month - 1, 0).getDate();
                 }
             },
